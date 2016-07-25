@@ -1,13 +1,13 @@
 'use strict';
 
 let error = require('mue-core/modules/error');
-const API_PREFIX = '/account';
+const API_PREFIX = '/api';
 
 let UserManager = require('../modules/user').UserManager;
 
 module.exports = function (app) {
     // create user
-    app.put(API_PREFIX + '/status', function (request, response, next) {
+    app.get(API_PREFIX + '/status', function (request, response, next) {
         response.send('ok');
     });
 

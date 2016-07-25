@@ -29,7 +29,7 @@ require('mue-core/modules/api-server')({
 });
 
 // connect to DB
-require('mue-core/modules/db').initConnection({
+require('modules/db').initConnection({
     port: config.get('db:port'),
     name: config.get('db:name'),
     host: config.get('db:host')
