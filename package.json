@@ -1,0 +1,29 @@
+{
+  "name": "account-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mueees/account-service.git"
+  },
+  "author": "Vitalii Mishchenko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mueees/account-service/issues"
+  },
+  "homepage": "https://github.com/mueees/account-service#readme",
+  "dependencies": {
+    "mue-core": "git+https://github.com/mueees/mue-core.git",
+    "app-module-path": "^1.1.0",
+    "chai": "3.5.0",
+    "eslint": "^2.13.0",
+    "lodash": "^4.13.1",
+    "mocha": "^2.5.3",
+    "mongoose": "^4.4.20",
+    "nconf": "^0.8.4"
+  }
+}
