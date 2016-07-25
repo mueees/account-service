@@ -14,7 +14,7 @@ let config = require('config');
 // start api server
 require('mue-core/modules/api-server')({
     name: config.get('name'),
-    port: config.get('services:api:port'),
+    port: config.get('network:port'),
 
     init: function (app) {
         // initialize routes
