@@ -21,21 +21,15 @@ module.exports = new mongoose.Schema({
         required: true
     },
 
-    create_date: {
-        type: Date,
-        default: new Date()
+    signupDate: {
+        type: Date
     },
 
-    confirmation_status: {
-        type: Boolean,
-        default: false
-    },
-
-    confirmation_id: {
+    confirmationId: {
         type: String
     },
 
-    confirmation_date: {
+    confirmationDate: {
         type: Date
     }
 });

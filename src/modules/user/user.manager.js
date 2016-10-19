@@ -4,7 +4,8 @@ let log = require('mue-core/modules/log')(module);
 let UserResource = require('./user.resource');
 let USER_SETTINGS = require('./user.constant');
 let _ = require('lodash');
-let utils = require('modules/utils');
+let utils = require('mue-core/modules//utils');
+let action = require('mue-core/modules/action');
 
 module.exports = {
     signup: signup
@@ -24,6 +25,7 @@ function signup(data) {
             }
         } else {
             log.error('Sign up provider invalid: ' + data.provider);
+
             reject('Invalid provider information');
         }
     });
@@ -31,7 +33,7 @@ function signup(data) {
 
 function signUpByWebProvider(userData) {
     return Promise(function (resolve, reject) {
-        let user = _.pick(userData, 'email', 'password');
+        let user = _.map(userData, 'email', 'password');
 
         if (utils.isStringWithLength(user.password) && utils.isEmail(user.email)) {
             canCreateUser(user.email)
@@ -41,12 +43,17 @@ function signUpByWebProvider(userData) {
 
                     UserResource.create(userData)
                         .then(function (user) {
-                            // TODO: send email with confirmation id
-
                             resolve(user);
+
+                            // TODO: send email with confirmation id
+                            /*action.execute('sendEmail', {
+                                to: user.email,
+                                message: 'You have been registered'
+                            });*/
                         })
                         .catch(function (error) {
                             log.error(error);
+
                             reject('Cannot signup user');
                         });
                 })
@@ -66,7 +73,7 @@ function signUpByWebProvider(userData) {
 
 function signUpByExternalProvider(userData, provider) {
     return Promise(function (resolve, reject) {
-        let user = _.pick(userData, 'email');
+        let user = _.map(userData, 'email');
 
         if (utils.isEmail(user.email)) {
             canCreateUser(user.email)
@@ -81,6 +88,7 @@ function signUpByExternalProvider(userData, provider) {
                         })
                         .catch(function (error) {
                             log.error(error);
+
                             reject('Cannot signup user');
                         });
                 })

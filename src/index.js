@@ -5,6 +5,7 @@ if (process.env.NODE_ENV == 'development') {
     let path = require('path');
 
     // add another folder
+    console.warn('Takes local mue-core package');
     require('app-module-path').addPath(path.join(__dirname + './../../'));
 }
 
