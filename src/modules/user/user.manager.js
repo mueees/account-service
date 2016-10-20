@@ -6,6 +6,7 @@ let USER_SETTINGS = require('./user.constant');
 let _ = require('lodash');
 let utils = require('mue-core/modules//utils');
 let action = require('mue-core/modules/action');
+let crypto = require('crypto');
 
 module.exports = {
     signup: signup
@@ -47,9 +48,9 @@ function signUpByWebProvider(userData) {
 
                             // TODO: send email with confirmation id
                             /*action.execute('sendEmail', {
-                                to: user.email,
-                                message: 'You have been registered'
-                            });*/
+                             to: user.email,
+                             message: 'You have been registered'
+                             });*/
                         })
                         .catch(function (error) {
                             log.error(error);
@@ -113,8 +114,11 @@ function isSignUpProviderValid(provider) {
  @param {password} string User password
  */
 function encryptPassword(password) {
-    // TODO: add encryption for password
-    return password + 'add encryption for password' + password;
+    var sha1 = crypto.createHash('sha1');
+
+    sha1.update(password + '---' + password);
+
+    return sha1.digest('hex');
 }
 
 function canCreateUser(email) {
@@ -142,4 +146,3 @@ function getUserByEmail(email) {
         return user;
     });
 }
-
