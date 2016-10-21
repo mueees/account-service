@@ -32,7 +32,7 @@ module.exports = function (app) {
      * */
 
     // sign up from the web provider
-    app.put(API_PREFIX + '/signup', function (request, response, next) {
+    app.post(API_PREFIX + '/signup', function (request, response, next) {
         UserManager.signup({
             provider: USER_SETTINGS.providers.web,
             userData: request.body
@@ -51,7 +51,7 @@ module.exports = function (app) {
      * */
 
     // sign up using external provider
-    app.put(API_PREFIX + '/signup/provider/:provider', function (request, response, next) {
+    app.post(API_PREFIX + '/signup/provider/:provider', function (request, response, next) {
         UserManager.signup({
             provider: request.params.provider,
             userData: request.body
@@ -65,7 +65,7 @@ module.exports = function (app) {
     });
 
     // confirm user
-    app.put(API_PREFIX + '/users/confirmation?:confirmation_id', function (request, response, next) {
+    app.get(API_PREFIX + '/users/confirmation?:confirmation_id', function (request, response, next) {
         response.send({});
     });
 

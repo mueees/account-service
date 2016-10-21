@@ -13,7 +13,7 @@ module.exports = {
 };
 
 function signup(data) {
-    return Promise(function (resolve, reject) {
+    return new Promise(function (resolve, reject) {
         if (isSignUpProviderValid(data.provider)) {
             if (data.provider === USER_SETTINGS.providers.web) {
                 signUpByWebProvider(data.userData)
@@ -33,14 +33,14 @@ function signup(data) {
 }
 
 function signUpByWebProvider(userData) {
-    return Promise(function (resolve, reject) {
-        let user = _.map(userData, 'email', 'password');
+    return new Promise(function (resolve, reject) {
+        let user = _.pick(userData, 'email', 'password');
 
         if (utils.isStringWithLength(user.password) && utils.isEmail(user.email)) {
             canCreateUser(user.email)
                 .then(function () {
-                    user.password = encryptPassword(user.password);
-                    user.provider = USER_SETTINGS.providers.web;
+                    userData.password = encryptPassword(user.password);
+                    userData.provider = USER_SETTINGS.providers.web;
 
                     UserResource.create(userData)
                         .then(function (user) {
@@ -73,7 +73,7 @@ function signUpByWebProvider(userData) {
 }
 
 function signUpByExternalProvider(userData, provider) {
-    return Promise(function (resolve, reject) {
+    return new Promise(function (resolve, reject) {
         let user = _.map(userData, 'email');
 
         if (utils.isEmail(user.email)) {
@@ -107,7 +107,7 @@ function signUpByExternalProvider(userData, provider) {
 }
 
 function isSignUpProviderValid(provider) {
-    return provider && _.find(USER_SETTINGS.signUpProviders, provider);
+    return provider && _.includes(USER_SETTINGS.signUpProviders, 'web');
 }
 
 /**
@@ -122,7 +122,7 @@ function encryptPassword(password) {
 }
 
 function canCreateUser(email) {
-    return Promise(function (resolve, reject) {
+    return new Promise(function (resolve, reject) {
         getUserByEmail(email)
             .then(function (user) {
                 if (user) {
@@ -142,7 +142,5 @@ function canCreateUser(email) {
 function getUserByEmail(email) {
     return UserResource.findOne({
         email: email
-    }).then(function (user) {
-        return user;
     });
 }
