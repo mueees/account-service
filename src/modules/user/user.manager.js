@@ -4,7 +4,7 @@ let log = require('mue-core/modules/log')(module);
 let UserResource = require('./user.resource');
 let USER_SETTINGS = require('./user.constant');
 let _ = require('lodash');
-let utils = require('mue-core/modules//utils');
+let utils = require('mue-core/modules/utils');
 let action = require('mue-core/modules/action');
 let crypto = require('crypto');
 
