@@ -1,5 +1,6 @@
 'use strict';
 
+let guid = require('mue-core/modules/guid');
 let log = require('mue-core/modules/log')(module);
 let UserResource = require('./user.resource');
 let USER_SETTINGS = require('./user.constant');
@@ -9,8 +10,44 @@ let action = require('mue-core/modules/action');
 let crypto = require('crypto');
 
 module.exports = {
-    signup: signup
+    signup: signup,
+    confirm: confirm
 };
+
+function confirm(confirmationId){
+    return new Promise(function (resolve, reject) {
+        if(!confirmationId){
+            log.error('Cannot find confirmation id');
+
+            return reject('Cannot find confirmation id');
+        }
+
+        UserResource.findOne({
+            confirmationId: confirmationId
+        }).then(function (user) {
+            if(!user){
+                log.error('Invalid confirmation id');
+
+                reject('Invalid confirmation id');
+            }else{
+                if(user.confirmationDate){
+                    log.error('Account already confirmed');
+
+                    reject('Account already confirmed');
+                }else{
+                    user.confirmationDate = new Date();
+                    resolve();
+
+                    user.save();
+                }
+            }
+        }).catch(function (err) {
+            log.error(err);
+
+            reject('Cannot confirm user');
+        });
+    });
+}
 
 function signup(data) {
     return new Promise(function (resolve, reject) {
@@ -36,21 +73,17 @@ function signUpByWebProvider(userData) {
     return new Promise(function (resolve, reject) {
         let user = _.pick(userData, 'email', 'password');
 
-        if (utils.isStringWithLength(user.password) && utils.isEmail(user.email)) {
+        if (isUserDataValid(user)) {
             canCreateUser(user.email)
                 .then(function () {
-                    userData.password = encryptPassword(user.password);
-                    userData.provider = USER_SETTINGS.providers.web;
+                    user.password = encryptPassword(user.password);
+                    user.provider = USER_SETTINGS.providers.web;
+                    user.signupDate = new Date();
+                    user.confirmationId = guid.generate();
 
-                    UserResource.create(userData)
+                    UserResource.create(user)
                         .then(function (user) {
                             resolve(user);
-
-                            // TODO: send email with confirmation id
-                            /*action.execute('sendEmail', {
-                             to: user.email,
-                             message: 'You have been registered'
-                             });*/
                         })
                         .catch(function (error) {
                             log.error(error);
@@ -64,9 +97,6 @@ function signUpByWebProvider(userData) {
                     reject(error);
                 });
         } else {
-            log.error(user.email);
-            log.error(user.password);
-
             reject('Invalid user data');
         }
     });
@@ -106,6 +136,10 @@ function signUpByExternalProvider(userData, provider) {
     });
 }
 
+/*
+* HELPERS
+* */
+
 function isSignUpProviderValid(provider) {
     return provider && _.includes(USER_SETTINGS.signUpProviders, 'web');
 }
@@ -143,4 +177,8 @@ function getUserByEmail(email) {
     return UserResource.findOne({
         email: email
     });
+}
+
+function isUserDataValid(userData){
+    return utils.isStringWithLength(userData.password) && utils.isEmail(userData.email);
 }

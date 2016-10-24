@@ -25,11 +25,11 @@ module.exports = new mongoose.Schema({
         type: Date
     },
 
-    confirmationPasswordId: {
+    confirmationId: {
         type: String
     },
 
-    confirmationPasswordDate: {
+    confirmationDate: {
         type: Date
     }
 });
