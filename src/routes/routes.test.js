@@ -94,7 +94,7 @@ describe('Routes', function () {
             data: userWebData
         }).catch(function (response) {
             asyncCheck(done, function () {
-                expect(response.message).to.be.equal('Invalid user data');
+                expect(response.message).to.be.equal('Invalid credentials');
             });
         });
     });
@@ -108,7 +108,7 @@ describe('Routes', function () {
             data: userWebData
         }).catch(function (response) {
             asyncCheck(done, function () {
-                expect(response.message).to.be.equal('Invalid user data');
+                expect(response.message).to.be.equal('Invalid credentials');
             });
         });
     });

@@ -11,8 +11,43 @@ let crypto = require('crypto');
 
 module.exports = {
     signup: signup,
-    confirm: confirm
+    confirm: confirm,
+    isCredentialValid: isCredentialValid
 };
+
+function isCredentialValid(email, password) {
+    return new Promise(function (resolve, reject) {
+        if (!isUserDataValid({
+                email: email,
+                password: password
+            })) {
+
+            return reject('Invalid credentials');
+        }
+
+        UserResource.findOne({
+            email: email
+        }).then(function (user) {
+            if (user) {
+                if (!user.confirmationDate) {
+                    return reject('Please check and confirm your email');
+                }
+
+                if (encryptPassword(password) !== user.password) {
+                    return reject('Email or password invalid');
+                }
+
+                resolve(user);
+            } else {
+                reject('Invalid credentials');
+            }
+        }).catch(function (err) {
+            log.error(err);
+
+            reject('Cannot find user');
+        });
+    });
+}
 
 function confirm(confirmationId) {
     return new Promise(function (resolve, reject) {
@@ -97,7 +132,7 @@ function signUpByWebProvider(userData) {
                     reject(error);
                 });
         } else {
-            reject('Invalid user data');
+            reject('Invalid credentials');
         }
     });
 }
@@ -131,7 +166,7 @@ function signUpByExternalProvider(userData, provider) {
         } else {
             log.error(user.email);
 
-            reject('Invalid user data');
+            reject('Invalid credentials');
         }
     });
 }

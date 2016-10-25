@@ -33,6 +33,17 @@ module.exports = function (app) {
         });
     });
 
+    // check whether account credentials valid or not
+    app.post(API_PREFIX + '/validation/credential', function (request, response, next) {
+        UserManager.isCredentialValid(request.body.email, request.body.password)
+            .then(function(user){
+                response.send(user);
+            })
+            .catch(function (err) {
+                next(error.getHttpError(400, err));
+            });
+    });
+
     /**
      * Oauth request that API, when user signin through external
      * providers
