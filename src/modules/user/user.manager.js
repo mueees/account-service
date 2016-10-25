@@ -14,9 +14,9 @@ module.exports = {
     confirm: confirm
 };
 
-function confirm(confirmationId){
+function confirm(confirmationId) {
     return new Promise(function (resolve, reject) {
-        if(!confirmationId){
+        if (!confirmationId) {
             log.error('Cannot find confirmation id');
 
             return reject('Cannot find confirmation id');
@@ -25,18 +25,18 @@ function confirm(confirmationId){
         UserResource.findOne({
             confirmationId: confirmationId
         }).then(function (user) {
-            if(!user){
+            if (!user) {
                 log.error('Invalid confirmation id');
 
                 reject('Invalid confirmation id');
-            }else{
-                if(user.confirmationDate){
+            } else {
+                if (user.confirmationDate) {
                     log.error('Account already confirmed');
 
                     reject('Account already confirmed');
-                }else{
+                } else {
                     user.confirmationDate = new Date();
-                    resolve();
+                    resolve(_.pick(user, ['_id', 'email']));
 
                     user.save();
                 }
@@ -137,8 +137,8 @@ function signUpByExternalProvider(userData, provider) {
 }
 
 /*
-* HELPERS
-* */
+ * HELPERS
+ * */
 
 function isSignUpProviderValid(provider) {
     return provider && _.includes(USER_SETTINGS.signUpProviders, 'web');
@@ -179,6 +179,6 @@ function getUserByEmail(email) {
     });
 }
 
-function isUserDataValid(userData){
+function isUserDataValid(userData) {
     return utils.isStringWithLength(userData.password) && utils.isEmail(userData.email);
 }

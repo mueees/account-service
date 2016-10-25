@@ -26,8 +26,8 @@ module.exports = function (app) {
 
     // confirm user
     app.get(API_PREFIX + '/confirmation?:confirmationId', function (request, response, next) {
-        UserManager.confirm(request.query.confirmationId).then(function () {
-            response.send();
+        UserManager.confirm(request.query.confirmationId).then(function (user) {
+            response.send(user);
         }).catch(function (err) {
             next(error.getHttpError(400, err));
         });
