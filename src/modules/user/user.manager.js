@@ -12,8 +12,110 @@ let crypto = require('crypto');
 module.exports = {
     signup: signup,
     confirm: confirm,
-    isCredentialValid: isCredentialValid
+    isCredentialValid: isCredentialValid,
+    generateNewPasswordConfirmationId: generateNewPasswordConfirmationId,
+    restorePassword: restorePassword,
+    getAccount: getAccount
 };
+
+function getAccount(id) {
+    return new Promise(function (resolve, reject) {
+        if (!id) {
+            reject({
+                message: 'Invalid user id'
+            });
+        } else {
+            UserResource.findOne({
+                _id: id
+            }).then(function (user) {
+                if (user) {
+                    resolve(user);
+                } else {
+                    reject({
+                        message: 'Invalid user id'
+                    });
+                }
+            }).catch(function (err) {
+                log.error(err.message);
+
+                reject({
+                    message: 'Server error'
+                })
+            });
+        }
+    });
+}
+
+function restorePassword(newPassword, passwordConfirmationId) {
+    return new Promise(function (resolve, reject) {
+        if (!passwordConfirmationId) {
+            reject({
+                message: 'Password confirmation id invalid'
+            });
+        } else {
+            UserResource.findOne({
+                passwordConfirmationId: passwordConfirmationId
+            }).then(function (user) {
+                if (user) {
+                    user.passwordConfirmationId = '';
+                    user.password = encryptPassword(newPassword);
+
+                    user.save()
+                        .then(function () {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            log.error(err.message);
+
+                            reject({
+                                message: 'Server error. Cannot save new password'
+                            });
+                        });
+                } else {
+                    reject({
+                        message: 'Invalid confirmation id'
+                    });
+                }
+            }).catch(function (err) {
+                log.error(err);
+
+                reject('Server error');
+            });
+        }
+    });
+}
+
+function generateNewPasswordConfirmationId(email) {
+    return new Promise(function (resolve, reject) {
+        if (!utils.isEmail(email)) {
+            reject({
+                message: 'Invalid email'
+            });
+        } else {
+            UserResource.findOne({
+                email: email
+            }).then(function (user) {
+                if (user) {
+                    user.passwordConfirmationId = guid.generate();
+
+                    resolve(user.passwordConfirmationId);
+
+                    user.save().catch(function () {
+                        log.error('Cannot save new passwordConfirmationId for user: ' + email);
+                    });
+                } else {
+                    reject({
+                        message: 'Cannot find user with such email: ' + email
+                    });
+                }
+            }).catch(function (err) {
+                log.error(err);
+
+                reject('Server error');
+            });
+        }
+    });
+}
 
 function isCredentialValid(email, password) {
     return new Promise(function (resolve, reject) {

@@ -31,5 +31,10 @@ module.exports = new mongoose.Schema({
 
     confirmationDate: {
         type: Date
+    },
+
+    // is for password restoring
+    passwordConfirmationId: {
+        type: String
     }
 });

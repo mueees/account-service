@@ -12,6 +12,9 @@ if (process.env.NODE_ENV == 'development') {
 /*RUN STAGE*/
 let config = require('config');
 
+// log Uncaught exception, Unhandled Rejection
+require('mue-core/modules/debug');
+
 // start api server
 require('mue-core/modules/api-server')({
     name: config.get('name'),

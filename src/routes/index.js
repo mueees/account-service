@@ -36,12 +36,42 @@ module.exports = function (app) {
     // check whether account credentials valid or not
     app.post(API_PREFIX + '/validation/credential', function (request, response, next) {
         UserManager.isCredentialValid(request.body.email, request.body.password)
-            .then(function(user){
+            .then(function (user) {
                 response.send(user);
             })
             .catch(function (err) {
                 next(error.getHttpError(400, err));
             });
+    });
+
+    // should generate new passwordConfirmationId
+    app.post(API_PREFIX + '/forgot-password', function (request, response, next) {
+        UserManager.generateNewPasswordConfirmationId(request.body.email).then(function (passwordConfirmationId) {
+            response.send(passwordConfirmationId);
+        }).catch(function (err) {
+            log.error(err.message);
+
+            next(error.getHttpError(400, err.message));
+        });
+    });
+
+    app.post(API_PREFIX + '/restore-password', function (request, response, next) {
+        UserManager.restorePassword(request.body.newPassword, request.body.passwordConfirmationId).then(function () {
+            response.send();
+        }).catch(function (err) {
+            log.error(err.message);
+
+            next(error.getHttpError(400, err.message));
+        });
+    });
+
+    // return account
+    app.get(API_PREFIX + '/account/:id', function (request, response, next) {
+        UserManager.getAccount(request.params.id).then(function (account) {
+            response.send(account);
+        }).catch(function (err) {
+            next(error.getHttpError(400, err.message));
+        });
     });
 
     /**
@@ -50,25 +80,25 @@ module.exports = function (app) {
      * */
     // sign up using external provider
     /*app.post(API_PREFIX + '/signup/provider/:provider', function (request, response, next) {
-        UserManager.signup({
-            provider: request.params.provider,
-            userData: request.body
-        }).then(function (user) {
-            response.send(user);
-        }, function (error) {
-            log.error(error);
+     UserManager.signup({
+     provider: request.params.provider,
+     userData: request.body
+     }).then(function (user) {
+     response.send(user);
+     }, function (error) {
+     log.error(error);
 
-            next(error.getHttpError(400, error));
-        });
-    });*/
+     next(error.getHttpError(400, error));
+     });
+     });*/
 
     // get user, using user_id from header
     /*app.get(API_PREFIX + '/users', function (request, response, next) {
-        response.send({});
-    });*/
+     response.send({});
+     });*/
 
     // get user by id
     /*app.get(API_PREFIX + '/users/:id', function (request, response, next) {
-        response.send({});
-    });*/
+     response.send({});
+     });*/
 };
